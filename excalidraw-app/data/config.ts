@@ -3,6 +3,7 @@ import {
   loadFilesFromFirebase,
   loadFromFirebase,
   saveFilesToFirebase,
+  saveSceneToFirebaseForMigration,
   saveToFirebase,
 } from "./firebase";
 import {
@@ -10,6 +11,7 @@ import {
   loadFilesFromHttpStorage,
   loadFromHttpStorage,
   saveFilesToHttpStorage,
+  saveSceneForMigration as saveSceneToHttpStorageForMigration,
   saveToHttpStorage,
 } from "./httpStorage";
 import { StorageBackend } from "./StorageBackend";
@@ -37,6 +39,7 @@ const firebaseStorage: StorageBackend = {
     };
   },
   loadFilesFromStorageBackend: loadFilesFromFirebase,
+  saveSceneForMigration: saveSceneToFirebaseForMigration,
 };
 
 const httpStorage: StorageBackend = {
@@ -45,6 +48,7 @@ const httpStorage: StorageBackend = {
   loadFromStorageBackend: loadFromHttpStorage,
   saveFilesToStorageBackend: saveFilesToHttpStorage,
   loadFilesFromStorageBackend: loadFilesFromHttpStorage,
+  saveSceneForMigration: saveSceneToHttpStorageForMigration,
 };
 
 const storageBackends = new Map<string, StorageBackend>()
@@ -58,7 +62,7 @@ export async function getStorageBackend() {
     return storageBackend;
   }
 
-  const storageBackendName = process.env.REACT_APP_STORAGE_BACKEND || "";
+  const storageBackendName = import.meta.env.VITE_APP_STORAGE_BACKEND || "";
 
   if (storageBackends.has(storageBackendName)) {
     storageBackend = storageBackends.get(storageBackendName) as StorageBackend;

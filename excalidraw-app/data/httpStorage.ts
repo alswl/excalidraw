@@ -22,7 +22,7 @@ import { decryptData } from "@excalidraw/excalidraw/data/encryption";
 import { StoredScene } from "./StorageBackend";
 import {Socket} from "socket.io-client";
 
-const HTTP_STORAGE_BACKEND_URL = process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL;
+const HTTP_STORAGE_BACKEND_URL = import.meta.env.VITE_APP_HTTP_STORAGE_BACKEND_URL;
 const SCENE_VERSION_LENGTH_BYTES = 4;
 
 // There is a lot of intentional duplication with the firebase file
@@ -120,21 +120,26 @@ export const loadFromHttpStorage = async (
   roomId: string,
   roomKey: string,
   socket: Socket | null,
-): Promise<readonly ExcalidrawElement[] | null> => {
-  const HTTP_STORAGE_BACKEND_URL =
-    process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL;
+): Promise<readonly SyncableExcalidrawElement[] | null> => {
   const getResponse = await fetch(
     `${HTTP_STORAGE_BACKEND_URL}/rooms/${roomId}`,
   );
 
+  if (!getResponse.ok) {
+    return null;
+  }
+
   const buffer = await getResponse.arrayBuffer();
+  if (!buffer.byteLength) {
+    return null;
+  }
   const elements = await getElementsFromBuffer(buffer, roomKey);
 
   if (socket) {
     httpStorageSceneVersionCache.set(socket, getSceneVersion(elements));
   }
 
-  return restoreElements(elements, null);
+  return getSyncableElements(restoreElements(elements, null));
 };
 
 const getElementsFromBuffer = async (
@@ -170,8 +175,6 @@ export const saveFilesToHttpStorage = async ({
   const erroredFiles: FileId[] = [];
   const savedFiles: FileId[] = [];
 
-  const HTTP_STORAGE_BACKEND_URL =
-    process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL;
 
   // prevent unused param warning
   void prefix;
@@ -208,8 +211,6 @@ export const loadFilesFromHttpStorage = async (
   // prevent unused param warning
   void prefix;
       try {
-        const HTTP_STORAGE_BACKEND_URL =
-          process.env.REACT_APP_HTTP_STORAGE_BACKEND_URL;
         const response = await fetch(`${HTTP_STORAGE_BACKEND_URL}/files/${id}`);
         if (response.status < 400) {
           const arrayBuffer = await response.arrayBuffer();
@@ -241,6 +242,11 @@ export const loadFilesFromHttpStorage = async (
   //////
 
   return { loadedFiles, erroredFiles };
+};
+
+export const saveSceneForMigration = async () => {
+  // http storage doesn't support this
+  console.error("Saving scene for migration is not supported in httpStorage");
 };
 
 const saveElementsToBackend = async (

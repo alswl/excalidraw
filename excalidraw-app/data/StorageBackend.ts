@@ -15,7 +15,7 @@ export interface StorageBackend {
     roomId: string,
     roomKey: string,
     socket: Socket | null,
-  ) => Promise<readonly ExcalidrawElement[] | null>;
+  ) => Promise<readonly SyncableExcalidrawElement[] | null>;
   saveFilesToStorageBackend: ({ 
     prefix,
     files,
@@ -34,6 +34,7 @@ export interface StorageBackend {
     loadedFiles: BinaryFileData[];
     erroredFiles: Map<FileId, true>;
   }>;
+  saveSceneForMigration: (id: string, name: string, data: Blob) => Promise<void>;
 }
 
 export interface StoredScene {
