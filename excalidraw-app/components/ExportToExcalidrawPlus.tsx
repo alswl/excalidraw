@@ -26,6 +26,7 @@ import { MIME_TYPES } from "@excalidraw/excalidraw/constants";
 import { trackEvent } from "@excalidraw/excalidraw/analytics";
 import { getFrame } from "@excalidraw/excalidraw/utils";
 import { ExcalidrawLogo } from "@excalidraw/excalidraw/components/ExcalidrawLogo";
+import { getStorageBackend } from "../data/config";
 
 export const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
@@ -50,6 +51,7 @@ export const exportToExcalidrawPlus = async (
     },
   );
 
+  // FIXME StorageBackend not covered this case, we should remove the use-case in the web page
   const storageRef = ref(storage, `/migrations/scenes/${id}`);
   await uploadBytes(storageRef, blob, {
     customMetadata: {
@@ -72,7 +74,8 @@ export const exportToExcalidrawPlus = async (
       maxBytes: FILE_UPLOAD_MAX_BYTES,
     });
 
-    await saveFilesToFirebase({
+    const storageBackend = await getStorageBackend();
+    await storageBackend.saveFilesToStorageBackend({
       prefix: `/migrations/files/scenes/${id}`,
       files: filesToUpload,
     });
