@@ -17,7 +17,7 @@ import { trackEvent } from "../../analytics";
 import { getFrame } from "../../utils";
 import { getStorageBackend } from "../data/config";
 
-const exportToExcalidrawPlus = async (
+export const exportToExcalidrawPlus = async (
   elements: readonly NonDeletedExcalidrawElement[],
   appState: Partial<AppState>,
   files: BinaryFiles,
