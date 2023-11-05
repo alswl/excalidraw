@@ -1,5 +1,7 @@
 interface Window {
   ClipboardItem: any;
+  // alswl: patch using window._env_
+  _env_: any | undefined;
   __EXCALIDRAW_SHA__: string | undefined;
   EXCALIDRAW_ASSET_PATH: string | string[] | undefined;
   EXCALIDRAW_EXPORT_SOURCE: string;
