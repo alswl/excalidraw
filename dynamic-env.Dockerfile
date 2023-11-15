@@ -13,7 +13,7 @@ RUN if [[ "$CHINA_MIRROR" = "true" ]] ; then \
     npm install -g cnpm --registry=https://registry.npmmirror.com; \
     npm config set registry https://registry.npmmirror.com; \
     fi
-    
+
 WORKDIR /opt/node_app
 
 COPY package.json yarn.lock ./
@@ -44,7 +44,7 @@ RUN if [[ "$CHINA_MIRROR" = "true" ]] ; then \
     echo "Enable China NPM Mirror" && \
     pip3 config set global.index-url https://mirrors.aliyun.com/pypi/simple; \
     fi
-    
+
 RUN pip3 install beautifulsoup4
 
 # env from upstream .env.production
@@ -65,5 +65,7 @@ COPY --from=build /opt/node_app/build /usr/share/nginx/html
 COPY launcher.py /
 
 HEALTHCHECK CMD wget -q -O /dev/null http://localhost || exit 1
+
+EXPOSE 80
 
 CMD ["python3", "/launcher.py", "/usr/share/nginx/html"]
