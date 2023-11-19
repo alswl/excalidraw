@@ -2,7 +2,7 @@ import React from "react";
 import { Card } from "../../src/components/Card";
 import { ToolButton } from "../../src/components/ToolButton";
 import { serializeAsJSON } from "../../src/data/json";
-import { loadFirebaseStorage, saveFilesToFirebase } from "../data/firebase";
+import { loadFirebaseStorage } from "../data/firebase";
 import { FileId, NonDeletedExcalidrawElement } from "../../src/element/types";
 import { AppState, BinaryFileData, BinaryFiles } from "../../src/types";
 import { nanoid } from "nanoid";
