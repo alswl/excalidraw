@@ -17,4 +17,9 @@
 **/build
 **/dist
 **/node_modules
+!index.html
+!index.tsx
+!vite.config.ts
+!vitest.config.ts
+!excalidraw-app
 !launcher.py
