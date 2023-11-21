@@ -3,25 +3,29 @@
 # usage:
 #
 # 1. modify nodejs process.env in src first
-# gsed -i 's/process.env/window._env_/g' $(grep 'process.env' -R -l src)
+# gsed -i 's/import.meta.env/window._env_/g' $(grep 'import.meta.env' -R -l src)
 # yarn build:app:docker
 #
 # 2. using env
-# export REACT_APP_BACKEND_V2_GET_URL=http://127.0.0.1:3000/api/v2/
-# export REACT_APP_BACKEND_V2_POST_URL=http://127.0.0.1:3000/api/v2/post/
-# export REACT_APP_LIBRARY_URL=https://libraries.excalidraw.com
-# export REACT_APP_LIBRARY_BACKEND=https://us-central1-excalidraw-room-persistence.cloudfunctions.net/libraries
-# export REACT_APP_PORTAL_URL=https://portal.excalidraw.com
-# export REACT_APP_WS_SERVER_URL="http://127.0.0.1"
-# export REACT_APP_FIREBASE_CONFIG='{"apiKey":"AIzaSyAd15pYlMci_xIp9ko6wkEsDzAAA0Dn0RU","authDomain":"excalidraw-room-persistence.firebaseapp.com","databaseURL":"https://excalidraw-room-persistence.firebaseio.com","projectId":"excalidraw-room-persistence","storageBucket":"excalidraw-room-persistence.appspot.com","messagingSenderId":"654800341332","appId":"1:654800341332:web:4a692de832b55bd57ce0c1"}'
-# export REACT_APP_GOOGLE_ANALYTICS_ID=UA-387204-13
-# export REACT_APP_MATOMO_URL=https://excalidraw.matomo.cloud/
-# export REACT_APP_CDN_MATOMO_TRACKER_URL=//cdn.matomo.cloud/excalidraw.matomo.cloud/matomo.js
-# export REACT_APP_MATOMO_SITE_ID=1
-# export REACT_APP_PLUS_APP=https://app.excalidraw.com
+# export VITE_APP_BACKEND_V2_GET_URL=http://127.0.0.1:3000/api/v2/
+# export VITE_APP_BACKEND_V2_POST_URL=http://127.0.0.1:3000/api/v2/post/
+# export VITE_APP_LIBRARY_URL=https://libraries.excalidraw.com
+# export VITE_APP_LIBRARY_BACKEND=https://us-central1-excalidraw-room-persistence.cloudfunctions.net/libraries
+# export VITE_APP_PORTAL_URL=https://portal.excalidraw.com
+# export VITE_APP_PLUS_LP=https://plus.excalidraw.com
+# export VITE_APP_PLUS_APP=https://app.excalidraw.com
+
+# export VITE_APP_WS_SERVER_URL="http://127.0.0.1"
+# export VITE_APP_FIREBASE_CONFIG='{"apiKey":"AIzaSyAd15pYlMci_xIp9ko6wkEsDzAAA0Dn0RU","authDomain":"excalidraw-room-persistence.firebaseapp.com","databaseURL":"https://excalidraw-room-persistence.firebaseio.com","projectId":"excalidraw-room-persistence","storageBucket":"excalidraw-room-persistence.appspot.com","messagingSenderId":"654800341332","appId":"1:654800341332:web:4a692de832b55bd57ce0c1"}'
+# export VITE_APP_DISABLE_TRACKING=false
+# export VITE_APP_GOOGLE_ANALYTICS_ID=UA-387204-13
+# export VITE_APP_MATOMO_URL=https://excalidraw.matomo.cloud/
+# export VITE_APP_CDN_MATOMO_TRACKER_URL=//cdn.matomo.cloud/excalidraw.matomo.cloud/matomo.js
+# export VITE_APP_MATOMO_SITE_ID=1
+# export VITE_APP_PLUS_APP=https://app.excalidraw.com
 # alswl's fork version env
-# export REACT_APP_HTTP_STORAGE_BACKEND_URL=http://127.0.0.1:8081/api/v2
-# export REACT_APP_STORAGE_BACKEND=http
+# export VITE_APP_HTTP_STORAGE_BACKEND_URL=http://127.0.0.1:8081/api/v2
+# export VITE_APP_STORAGE_BACKEND=http
 #
 # 3. launch nginx, python launcher.py /usr/share/nginx/html
 
@@ -66,8 +70,8 @@ def get_env_or_default(name: str):
 
 def get_envs():
     envs = [key for key, value in os.environ.items()]
-    react_apps = [key for key in envs if key.startswith("REACT_APP_")]
-    return react_apps + embed_envs
+    vite_apps = [key for key in envs if key.startswith("VITE_APP_")]
+    return vite_apps + embed_envs
 
 
 def gen_dot_env(root: str):
@@ -166,7 +170,8 @@ def main():
         print("index.html not found")
         sys.exit(1)
 
-    # gen .env
+    # gen .env not required in launcher
+    # gen_dot_env(root)
     code = gen_env_js(root)
     patch_index_html(root, code)
     patch_service_worker(root)
