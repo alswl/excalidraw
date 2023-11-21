@@ -41,7 +41,7 @@ export async function getStorageBackend() {
     return storageBackend;
   }
 
-  const storageBackendName = process.env.REACT_APP_STORAGE_BACKEND || "";
+  const storageBackendName = import.meta.env.VITE_APP_STORAGE_BACKEND || "";
 
   if (storageBackends.has(storageBackendName)) {
     storageBackend = storageBackends.get(storageBackendName) as StorageBackend;
