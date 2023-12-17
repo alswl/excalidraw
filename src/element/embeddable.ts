@@ -16,9 +16,9 @@ import {
 
 type EmbeddedLink =
   | ({
-      aspectRatio: { w: number; h: number };
-      warning?: string;
-    } & (
+    aspectRatio: { w: number; h: number };
+    warning?: string;
+  } & (
       | { type: "video" | "generic"; link: string }
       | { type: "document"; srcdoc: (theme: Theme) => string }
     ))
@@ -65,6 +65,7 @@ const ALLOWED_DOMAINS = new Set([
   "val.town",
   "giphy.com",
   "dddice.com",
+  "*.*",
 ]);
 
 const createSrcDoc = (body: string) => {
