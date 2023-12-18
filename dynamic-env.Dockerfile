@@ -1,6 +1,6 @@
-FROM node:18 AS build
+FROM node:hydrogen-alpine3.18 AS build
 
-ARG CHINA_MIRROR=false
+ARG CHINA_MIRROR=true
 
 # enable china mirror
 RUN if [[ "$CHINA_MIRROR" = "true" ]] ; then \
@@ -23,7 +23,7 @@ ARG NODE_ENV=production
 
 COPY . .
 # disable webpack env loader, use dynamic env
-RUN sed -i 's/import.meta.env/window._env_/g' $(grep 'import.meta.env' -R -l --include "*.ts" --include "*.tsx" --exclude-dir node_modules .)
+RUN find . -type f \( -name "*.ts" -o -name "*.tsx" \) -not -path "*/node_modules/*" -exec grep -l 'import.meta.env' {} \; | xargs sed -i 's/import.meta.env/window._env_/g'
 RUN yarn build:app:docker
 
 FROM nginx:1.21-alpine
