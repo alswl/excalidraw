@@ -257,6 +257,10 @@ const validateHostname = (
   /** using a Set assumes it already contains normalized bare domains */
   allowedHostnames: Set<string> | string,
 ): boolean => {
+  if (ALLOWED_DOMAINS.has("*")) {
+    return true
+  }
+
   try {
     const { hostname } = new URL(url);
 
