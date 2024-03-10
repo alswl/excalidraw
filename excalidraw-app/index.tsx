@@ -102,7 +102,7 @@ import { openConfirmModal } from "../src/components/OverwriteConfirm/OverwriteCo
 import { OverwriteConfirmDialog } from "../src/components/OverwriteConfirm/OverwriteConfirm";
 import Trans from "../src/components/Trans";
 
-import { storageBackend } from "./data/config";
+import { storageBackend, getStorageBackend } from "./data/config";
 
 polyfill();
 
@@ -390,6 +390,7 @@ const ExcalidrawWrapper = () => {
     };
 
     initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
+      await getStorageBackend();
       loadImages(data, /* isInitialLoad */ true);
       initialStatePromiseRef.current.promise.resolve(data.scene);
     });
