@@ -75,7 +75,7 @@ import {
 import { updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "@excalidraw/excalidraw/element/mutateElement";
 import { isInitializedImageElement } from "@excalidraw/excalidraw/element/typeChecks";
-import { storageBackend } from "./data/config";
+import { storageBackend, getStorageBackend } from "./data/config";
 import {
   LibraryIndexedDBAdapter,
   LibraryLocalStorageMigrationAdapter,
@@ -465,6 +465,7 @@ const ExcalidrawWrapper = () => {
     };
 
     initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
+      await getStorageBackend();
       loadImages(data, /* isInitialLoad */ true);
       initialStatePromiseRef.current.promise.resolve(data.scene);
     });
