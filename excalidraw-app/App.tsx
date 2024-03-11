@@ -467,6 +467,7 @@ const ExcalidrawWrapper = () => {
     };
 
     initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
+      await getStorageBackend();
       loadImages(data, /* isInitialLoad */ true);
       initialStatePromiseRef.current.promise.resolve(data.scene);
     });
