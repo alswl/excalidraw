@@ -27,6 +27,7 @@ RUN sed -i 's/import.meta.env/window._env_/g' $(grep 'import.meta.env' -R -l --i
 RUN yarn build:app:docker
 
 FROM nginxinc/nginx-unprivileged:1.25.3-alpine-slim
+USER root
 
 ARG CHINA_MIRROR=false
 
@@ -45,6 +46,8 @@ RUN if [[ "$CHINA_MIRROR" = "true" ]] ; then \
     fi
 
 RUN pip3 install beautifulsoup4
+
+USER $UID
 
 # env from upstream .env.production
 
