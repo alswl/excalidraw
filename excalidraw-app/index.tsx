@@ -80,7 +80,6 @@ import {
 import { updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../src/element/mutateElement";
 import { isInitializedImageElement } from "../src/element/typeChecks";
-import { loadFilesFromFirebase } from "./data/firebase";
 import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
@@ -102,6 +101,8 @@ import { ShareableLinkDialog } from "../src/components/ShareableLinkDialog";
 import { openConfirmModal } from "../src/components/OverwriteConfirm/OverwriteConfirmState";
 import { OverwriteConfirmDialog } from "../src/components/OverwriteConfirm/OverwriteConfirm";
 import Trans from "../src/components/Trans";
+
+import { storageBackend, getStorageBackend } from "./data/config";
 
 polyfill();
 
@@ -352,18 +353,20 @@ const ExcalidrawWrapper = () => {
           }, [] as FileId[]) || [];
 
         if (data.isExternalScene) {
-          loadFilesFromFirebase(
-            `${FIREBASE_STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
-            data.key,
-            fileIds,
-          ).then(({ loadedFiles, erroredFiles }) => {
-            excalidrawAPI.addFiles(loadedFiles);
-            updateStaleImageStatuses({
-              excalidrawAPI,
-              erroredFiles,
-              elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
+          storageBackend
+            ?.loadFilesFromStorageBackend(
+              `${FIREBASE_STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
+              data.key,
+              fileIds,
+            )
+            .then(({ loadedFiles, erroredFiles }) => {
+              excalidrawAPI.addFiles(loadedFiles);
+              updateStaleImageStatuses({
+                excalidrawAPI,
+                erroredFiles,
+                elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
+              });
             });
-          });
         } else if (isInitialLoad) {
           if (fileIds.length) {
             LocalData.fileStorage
@@ -387,6 +390,7 @@ const ExcalidrawWrapper = () => {
     };
 
     initializeScene({ collabAPI, excalidrawAPI }).then(async (data) => {
+      await getStorageBackend();
       loadImages(data, /* isInitialLoad */ true);
       initialStatePromiseRef.current.promise.resolve(data.scene);
     });

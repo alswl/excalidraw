@@ -23,8 +23,8 @@ import {
   FILE_UPLOAD_MAX_BYTES,
   ROOM_ID_BYTES,
 } from "../app_constants";
+import { getStorageBackend } from "./config";
 import { encodeFilesForUpload } from "./FileManager";
-import { saveFilesToFirebase } from "./firebase";
 
 export type SyncableExcalidrawElement = ExcalidrawElement & {
   _brand: "SyncableExcalidrawElement";
@@ -61,15 +61,16 @@ const generateRoomId = async () => {
  * from upstream is to allow changing the params immediately when needed without
  * having to wait for clients to update the SW.
  *
- * If REACT_APP_WS_SERVER_URL env is set, we use that instead (useful for forks)
+ * If VITE_APP_WS_SERVER_URL env is set, we use that instead (useful for forks)
  */
 export const getCollabServer = async (): Promise<{
   url: string;
   polling: boolean;
 }> => {
-  if (import.meta.env.VITE_APP_WS_SERVER_URL) {
+  const wsServerURL = import.meta.env.VITE_APP_WS_SERVER_URL;
+  if (wsServerURL) {
     return {
-      url: import.meta.env.VITE_APP_WS_SERVER_URL,
+      url: wsServerURL,
       polling: true,
     };
   }
@@ -326,7 +327,8 @@ export const exportToBackend = async (
       url.hash = `json=${json.id},${encryptionKey}`;
       const urlString = url.toString();
 
-      await saveFilesToFirebase({
+      const storageBackend = await getStorageBackend();
+      await storageBackend.saveFilesToStorageBackend({
         prefix: `/files/shareLinks/${json.id}`,
         files: filesToUpload,
       });
