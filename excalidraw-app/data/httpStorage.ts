@@ -2,21 +2,19 @@
 // MIT, Kilian Decaderincourt
 
 import { getSyncableElements, SyncableExcalidrawElement } from ".";
-import { MIME_TYPES } from "../../src/constants";
-import { decompressData } from "../../src/data/encode";
-import { encryptData, IV_LENGTH_BYTES } from "../../src/data/encryption";
-import { restoreElements } from "../../src/data/restore";
-import { getSceneVersion } from "../../src/element";
-import { ExcalidrawElement, FileId } from "../../src/element/types";
+import { MIME_TYPES } from "@excalidraw/excalidraw/constants";
+import { decompressData } from "@excalidraw/excalidraw/data/encode";
+import { encryptData, decryptData, IV_LENGTH_BYTES } from "@excalidraw/excalidraw/data/encryption";
+import { getSceneVersion } from "@excalidraw/excalidraw/element";
+import { ExcalidrawElement, FileId } from "@excalidraw/excalidraw/element/types";
 import {
   AppState,
   BinaryFileData,
   BinaryFileMetadata,
   DataURL,
-} from "../../src/types";
+} from "@excalidraw/excalidraw/types";
 import Portal from "../collab/Portal";
-import { reconcileElements } from "../collab/reconciliation";
-import { decryptData } from "../../src/data/encryption";
+import { restoreElements, reconcileElements } from "@excalidraw/excalidraw";
 import { StoredScene } from "./StorageBackend";
 
 const HTTP_STORAGE_BACKEND_URL = import.meta.env
