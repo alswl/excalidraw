@@ -17,6 +17,8 @@ import Portal from "../collab/Portal";
 import { restoreElements, reconcileElements } from "@excalidraw/excalidraw";
 import { StoredScene } from "./StorageBackend";
 
+import type { Socket } from "socket.io-client";
+
 const HTTP_STORAGE_BACKEND_URL = import.meta.env
   .VITE_APP_HTTP_STORAGE_BACKEND_URL;
 const SCENE_VERSION_LENGTH_BYTES = 4;
@@ -25,7 +27,7 @@ const SCENE_VERSION_LENGTH_BYTES = 4;
 // to prevent modifying upstream files and ease futur maintenance of this fork
 
 const httpStorageSceneVersionCache = new WeakMap<
-  SocketIOClient.Socket,
+  Socket,
   number
 >();
 
@@ -114,7 +116,7 @@ export const saveToHttpStorage = async (
 export const loadFromHttpStorage = async (
   roomId: string,
   roomKey: string,
-  socket: SocketIOClient.Socket | null,
+  socket: Socket | null,
 ): Promise<readonly ExcalidrawElement[] | null> => {
   const getResponse = await fetch(
     `${HTTP_STORAGE_BACKEND_URL}/rooms/${roomId}`,
