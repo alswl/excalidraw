@@ -11,12 +11,12 @@ export interface StorageBackend {
     portal: Portal,
     elements: readonly SyncableExcalidrawElement[],
     appState: AppState,
-  ) => Promise<false | { reconciledElements: any }>;
+  ) => Promise<SyncableExcalidrawElement[] | null>;
   loadFromStorageBackend: (
     roomId: string,
     roomKey: string,
     socket: Socket | null,
-  ) => Promise<readonly ExcalidrawElement[] | null>;
+  ) => Promise<readonly SyncableExcalidrawElement[] | null>;
   saveFilesToStorageBackend: ({
     prefix,
     files,
@@ -27,8 +27,8 @@ export interface StorageBackend {
       buffer: Uint8Array;
     }[];
   }) => Promise<{
-    savedFiles: Map<FileId, true>;
-    erroredFiles: Map<FileId, true>;
+    savedFiles: FileId[];
+    erroredFiles: FileId[];
   }>;
   loadFilesFromStorageBackend: (
     prefix: string,

@@ -6,7 +6,11 @@ import { MIME_TYPES } from "@excalidraw/excalidraw/constants";
 import { decompressData } from "@excalidraw/excalidraw/data/encode";
 import { encryptData, decryptData, IV_LENGTH_BYTES } from "@excalidraw/excalidraw/data/encryption";
 import { getSceneVersion } from "@excalidraw/excalidraw/element";
-import { ExcalidrawElement, FileId } from "@excalidraw/excalidraw/element/types";
+import type {
+  ExcalidrawElement,
+  FileId,
+  OrderedExcalidrawElement,
+} from "@excalidraw/excalidraw/element/types";
 import {
   AppState,
   BinaryFileData,
@@ -16,8 +20,8 @@ import {
 import Portal from "../collab/Portal";
 import { restoreElements, reconcileElements } from "@excalidraw/excalidraw";
 import { StoredScene } from "./StorageBackend";
-
 import type { Socket } from "socket.io-client";
+import type { RemoteExcalidrawElement } from "@excalidraw/excalidraw/data/reconcile";
 
 const HTTP_STORAGE_BACKEND_URL = import.meta.env
   .VITE_APP_HTTP_STORAGE_BACKEND_URL;
@@ -59,7 +63,7 @@ export const saveToHttpStorage = async (
     !socket ||
     isSavedToHttpStorage(portal, elements)
   ) {
-    return false;
+    return null;
   }
 
   const sceneVersion = getSceneVersion(elements);
@@ -68,33 +72,37 @@ export const saveToHttpStorage = async (
   );
 
   if (!getResponse.ok && getResponse.status !== 404) {
-    return false;
+    return null;
   }
   if (getResponse.status === 404) {
+    // This whole thing might be unnecessary
     const result: boolean = await saveElementsToBackend(
       roomKey,
       roomId,
       [...elements],
       sceneVersion,
     );
+    // certainly this is unnecessary
     if (result) {
-      return {
-        reconciledElements: null,
-      };
+      return null;
     }
-    return false;
+    return null;
   }
   // If room already exist, we compare scene versions to check
   // if we're up to date before saving our scene
   const buffer = await getResponse.arrayBuffer();
   const sceneVersionFromRequest = parseSceneVersionFromRequest(buffer);
   if (sceneVersionFromRequest >= sceneVersion) {
-    return false;
+    return null;
   }
 
   const existingElements = await getElementsFromBuffer(buffer, roomKey);
   const reconciledElements = getSyncableElements(
-    reconcileElements(elements, existingElements, appState),
+    reconcileElements(
+      elements,
+      existingElements as OrderedExcalidrawElement[] as RemoteExcalidrawElement[],
+      appState
+    ),
   );
 
   const result: boolean = await saveElementsToBackend(
@@ -106,30 +114,30 @@ export const saveToHttpStorage = async (
 
   if (result) {
     httpStorageSceneVersionCache.set(socket, sceneVersion);
-    return {
-      reconciledElements: elements,
-    };
+    return reconciledElements;
   }
-  return false;
+  return null;
 };
 
 export const loadFromHttpStorage = async (
   roomId: string,
   roomKey: string,
   socket: Socket | null,
-): Promise<readonly ExcalidrawElement[] | null> => {
+): Promise<readonly SyncableExcalidrawElement[] | null> => {
   const getResponse = await fetch(
     `${HTTP_STORAGE_BACKEND_URL}/rooms/${roomId}`,
   );
 
   const buffer = await getResponse.arrayBuffer();
-  const elements = await getElementsFromBuffer(buffer, roomKey);
+  const elements = getSyncableElements(
+    restoreElements(await getElementsFromBuffer(buffer, roomKey), null)
+  );
 
   if (socket) {
     httpStorageSceneVersionCache.set(socket, getSceneVersion(elements));
   }
 
-  return restoreElements(elements, null);
+  return elements;
 };
 
 const getElementsFromBuffer = async (
@@ -162,8 +170,8 @@ export const saveFilesToHttpStorage = async ({
   prefix: string;
   files: { id: FileId; buffer: Uint8Array }[];
 }) => {
-  const erroredFiles = new Map<FileId, true>();
-  const savedFiles = new Map<FileId, true>();
+  const erroredFiles: FileId[] = [];
+  const savedFiles: FileId[] = [];
 
   await Promise.all(
     files.map(async ({ id, buffer }) => {
@@ -174,9 +182,9 @@ export const saveFilesToHttpStorage = async ({
           method: "PUT",
           body: payload,
         });
-        savedFiles.set(id, true);
+        savedFiles.push(id);
       } catch (error: any) {
-        erroredFiles.set(id, true);
+        erroredFiles.push(id);
       }
     }),
   );
