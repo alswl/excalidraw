@@ -214,7 +214,9 @@
     </header>
     <div id="root"></div>
     <script type="module" src="index.tsx"></script>
-    <% if (typeof PROD != 'undefined' && PROD == true) { %>
+    <% if (typeof PROD != 'undefined' && PROD == true &&
+    typeof VITE_APP_ENABLE_TRACKING != 'undefined' &&
+    VITE_APP_ENABLE_TRACKING == true) { %>
     <!-- 100% privacy friendly analytics -->
     <script>
       // need to load this script dynamically bcs. of iframe embed tracking
