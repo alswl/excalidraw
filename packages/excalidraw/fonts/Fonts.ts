@@ -1,9 +1,10 @@
 import {
+  CJK_HAND_DRAWN_FALLBACK_2_FONT,
+  CJK_HAND_DRAWN_FALLBACK_FONT,
   FONT_FAMILY,
   FONT_FAMILY_FALLBACKS,
-  CJK_HAND_DRAWN_FALLBACK_FONT,
-  WINDOWS_EMOJI_FALLBACK_FONT,
   getFontFamilyFallbacks,
+  WINDOWS_EMOJI_FALLBACK_FONT,
 } from "../constants";
 import { isTextElement } from "../element";
 import { getContainerElement } from "../element/textElement";
@@ -17,6 +18,7 @@ import { ComicShannsFontFaces } from "./ComicShanns";
 import { EmojiFontFaces } from "./Emoji";
 import { ExcalifontFontFaces } from "./Excalifont";
 import { HelveticaFontFaces } from "./Helvetica";
+import { HanziPenSCFontFaces } from "./HanziPenSC";
 import { LiberationFontFaces } from "./Liberation";
 import { LilitaFontFaces } from "./Lilita";
 import { NunitoFontFaces } from "./Nunito";
@@ -384,7 +386,8 @@ export class Fonts {
     init("Virgil", ...VirgilFontFaces);
 
     // fallback font faces
-    init(CJK_HAND_DRAWN_FALLBACK_FONT, ...XiaolaiFontFaces);
+    init(CJK_HAND_DRAWN_FALLBACK_FONT, ...HanziPenSCFontFaces);
+    init(CJK_HAND_DRAWN_FALLBACK_2_FONT, ...XiaolaiFontFaces);
     init(WINDOWS_EMOJI_FALLBACK_FONT, ...EmojiFontFaces);
 
     Fonts._initialized = true;
