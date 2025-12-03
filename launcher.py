@@ -32,6 +32,7 @@
 
 import argparse
 import os
+import select
 import signal
 import subprocess
 import sys
@@ -124,22 +125,33 @@ def exec_nginx():
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         stdin=subprocess.PIPE,
-        # cmd, stdout=subprocess.PIPE,
+        text=True,
+        bufsize=1
     )
     try:
         while True:
-            readline = p.stdout.readline()
-            try:
-                stdout = readline.decode("utf-8").strip()
+          reads = [p.stdout.fileno(), p.stderr.fileno()]
+          ret = select.select(reads, [], [], 0.1)  # 0.1s timeout
 
-                if stdout:
-                    print(stdout)
-            except UnicodeDecodeError:
-                pass
+          for fd in ret[0]:
+            if fd == p.stdout.fileno():
+              line = p.stdout.readline()
+              if line:
+                print("STDOUT:", line.strip())
+            elif fd == p.stderr.fileno():
+              line = p.stderr.readline()
+              if line:
+                print("STDERR:", line.strip())
 
+          if p.poll() is not None:
+            break
     except KeyboardInterrupt:
         p.send_signal(signal.SIGINT)
-        p.wait()
+        try:
+          p.wait(timeout=2)
+        except subprocess.TimeoutExpired:
+          p.kill()
+          p.wait()
 
 
 def patch_service_worker(root):
