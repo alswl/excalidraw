@@ -4,6 +4,10 @@ on:
   push:
     branches:
       - release-fork
+      - release/*
+      - feat/*
+
+  workflow_dispatch:
 
 jobs:
   build-docker:
