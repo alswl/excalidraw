@@ -32,12 +32,11 @@
 
 import argparse
 import os
+import re
 import select
 import signal
 import subprocess
 import sys
-
-from bs4 import BeautifulSoup
 
 PATCH_BY = "x-patch-by"
 ALSWL_EXCALIDRAW = "alswl/excalidraw"
@@ -97,25 +96,27 @@ def gen_env_js(root: str):
 
 
 def patch_index_html(root: str, script: str):
-    with open(os.path.join(root, "index.html"), "r") as f:
+    path = os.path.join(root, "index.html")
+    with open(path, "r") as f:
         page = f.read()
 
     with open(os.path.join(root, "index.origin.html"), "w") as f:
         f.write(page)
 
-    soup = BeautifulSoup(page, "html.parser")
-    first = soup.find("script")
-    if first is None:
-        print("script not found")
-        sys.exit(1)
-    if first.has_attr(PATCH_BY) and first[PATCH_BY] == ALSWL_EXCALIDRAW:
+    # check if already patched
+    if f'{PATCH_BY}="{ALSWL_EXCALIDRAW}"' in page:
         return
-    new_script = soup.new_tag("script")
-    new_script.string = script
-    new_script[PATCH_BY] = ALSWL_EXCALIDRAW
-    first.insert_before(new_script)
-    with open(os.path.join(root, "index.html"), "w") as f:
-        f.write(soup.prettify())
+
+    pattern = r'(<script\b[^>]*>)'
+    replacement = f'<script {PATCH_BY}="{ALSWL_EXCALIDRAW}">{script}</script>\n\\1'
+    patched, count = re.subn(pattern, replacement, page, count=1)
+
+    if count == 0:
+        print("script tag not found")
+        sys.exit(1)
+
+    with open(path, "w") as f:
+        f.write(patched)
 
 
 def exec_nginx():

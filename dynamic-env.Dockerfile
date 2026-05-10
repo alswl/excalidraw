@@ -9,9 +9,10 @@ RUN if [[ "$CHINA_MIRROR" = "true" ]] ; then \
     fi
 
 RUN if [[ "$CHINA_MIRROR" = "true" ]] ; then \
-    echo "Enable China NPM Mirror" && \
+    echo "Enable China NPM/Yarn Mirror" && \
     npm install -g cnpm --registry=https://registry.npmmirror.com; \
     npm config set registry https://registry.npmmirror.com; \
+    yarn config set registry https://registry.npmmirror.com; \
     fi
 
 WORKDIR /opt/node_app
@@ -38,16 +39,7 @@ RUN if [[ "$CHINA_MIRROR" = "true" ]] ; then \
     sed -i 's/dl-cdn.alpinelinux.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apk/repositories; \
     fi
 
-RUN apk update && apk add sed bash python3 py3-pip
-
-# enable china mirror
-RUN if [[ "$CHINA_MIRROR" = "true" ]] ; then \
-    echo "Enable China NPM Mirror" && \
-    pip3 config set global.index-url https://mirrors.aliyun.com/pypi/simple; \
-    fi
-
-RUN python3 -m venv /opt/node_app/.venv
-RUN . /opt/node_app/.venv/bin/activate && pip3 install beautifulsoup4
+RUN apk update && apk add sed bash python3
 
 # env from upstream .env.production
 
@@ -68,4 +60,4 @@ COPY launcher.py /
 HEALTHCHECK CMD wget -q -O /dev/null http://localhost || exit 1
 EXPOSE 80
 
-CMD ["/opt/node_app/.venv/bin/python3", "/launcher.py", "/usr/share/nginx/html"]
+CMD ["python3", "/launcher.py", "/usr/share/nginx/html"]
