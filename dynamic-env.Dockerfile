@@ -1,4 +1,4 @@
-FROM node:20 AS build
+FROM node:24 AS build
 
 ARG CHINA_MIRROR=false
 
