@@ -11,6 +11,12 @@
 !scripts/
 !tsconfig.json
 !yarn.lock
+!index.html
+!index.tsx
+!vite.config.ts
+!vitest.config.ts
+!excalidraw-app
+!launcher.py
 
 # keep (sub)sub directories at the end to exclude from explicit included
 # e.g. ./packages/excalidraw/{dist,node_modules}
