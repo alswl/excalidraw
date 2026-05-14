@@ -1,3 +1,5 @@
+import "./env";
+
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import ExcalidrawApp from "./App";
