@@ -26,6 +26,7 @@ vi.mock("../../excalidraw-app/data/firebase.ts", () => {
   const loadFromFirebase = async () => null;
   const saveToFirebase = () => {};
   const isSavedToFirebase = () => true;
+  const saveSceneToFirebaseForMigration = () => {};
   const loadFilesFromFirebase = async () => ({
     loadedFiles: [],
     erroredFiles: [],
@@ -41,6 +42,7 @@ vi.mock("../../excalidraw-app/data/firebase.ts", () => {
     isSavedToFirebase,
     loadFilesFromFirebase,
     saveFilesToFirebase,
+    saveSceneToFirebaseForMigration,
   };
 });
 
