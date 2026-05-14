@@ -1,3 +1,5 @@
+import "./env";
+
 import React, { useEffect } from "react";
 import { InitializeApp } from "./components/InitializeApp";
 import App from "./components/App";
